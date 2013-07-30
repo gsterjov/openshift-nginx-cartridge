@@ -27,7 +27,6 @@ Provides:
   - nginx-1.4.2
   - "nginx"
   - "nginx(version) = 1.4.2"
-
 Publishes:
   get-doc-root:
     Type: "FILESYSTEM:doc-root"
@@ -35,16 +34,13 @@ Publishes:
     Type: "NET_TCP:httpd-proxy-info"
   publish-gear-endpoint:
     Type: "NET_TCP:gear-endpoint-info"
-
 Scaling:
   Min: 1
   Max: -1
-
 Group-Overrides:
   - components:
     - nginx-1.4.2
     - web_proxy
-
 Endpoints:
   - Private-IP-Name:   HTTP_IP
     Private-Port-Name: HTTP_PORT
