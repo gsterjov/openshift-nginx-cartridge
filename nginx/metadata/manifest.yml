@@ -1,32 +1,23 @@
-Name: Nginx
-Cartridge-Short-Name: NGINX
-Cartridge-Version: '0.0.1'
-Compatible-Versions: ['0.0.1']
-Cartridge-Vendor: gsterjov
-Display-Name: Nginx 1.4.2
-Description: "Nginx is a free, open-source, high-performance HTTP server and reverse proxy, as well as an IMAP/POP3 proxy server."
-Version: '1.4.2'
-Versions: ['1.4.2']
-License: "BSD-like"
-License-Url: http://nginx.org/LICENSE
-Vendor: Nginx Inc.
+Name: go
+Cartridge-Short-Name: GO
+Display-Name: Go 1.1
+Version: "1.1"
+Versions: ["1.1", "1.0.3"]
+Website: https://github.com/smarterclayton/openshift-go-cart
+Cartridge-Version: 0.0.1
+Cartridge-Vendor: smarterclayton
 Categories:
   - service
+  - golang
   - web_framework
-Website: http://www.nginx.org
-Help-Topics:
-  "Developer Center": https://openshift.redhat.com/community/developers
-Cart-Data:
-  - Key: OPENSHIFT_NGINX_LOG_DIR
-    Type: environment
-    Description: "Directory to store application log files."
-  - Key: OPENSHIFT_TMP_DIR
-    Type: environment
-    Description: "Directory to store application temporary files."
 Provides:
-  - nginx-1.4.2
-  - "nginx"
-  - "nginx(version) = 1.4.2"
+  - go-1.1
+  - "go"
+  - "go (version) = 1.1"
+  - "go (version) = 1"
+Scaling:
+  Min: 1
+  Max: -1
 Publishes:
   get-doc-root:
     Type: "FILESYSTEM:doc-root"
@@ -34,18 +25,45 @@ Publishes:
     Type: "NET_TCP:httpd-proxy-info"
   publish-gear-endpoint:
     Type: "NET_TCP:gear-endpoint-info"
-Scaling:
-  Min: 1
-  Max: -1
+Subscribes:
+  set-db-connection-info:
+    Type: "ENV:NET_TCP:db:connection-info"
+    Required: false
+  set-mysql-connection-info:
+    Type: "NET_TCP:db:mysql"
+    Required : false
+  set-postgres-connection-info:
+    Type: "NET_TCP:db:postgres"
+    Required : false
+  set-nosql-db-connection-info:
+    Type: "ENV:NET_TCP:nosqldb:connection-info"
+    Required : false
 Group-Overrides:
   - components:
-    - nginx-1.4.2
+    - go-1.1
     - web_proxy
 Endpoints:
-  - Private-IP-Name:   HTTP_IP
-    Private-Port-Name: HTTP_PORT
+  - Private-IP-Name:   IP
+    Private-Port-Name: PORT
     Private-Port:      8080
-    Public-Port-Name:  HTTP_PROXY_PORT
+    Public-Port-Name:  PROXY_PORT
     Mappings:
       - Frontend:      ""
         Backend:       ""
+        Options:       { websocket: true }
+      - Frontend:      "/health"
+        Backend:       ""
+        Options:       { health: true }
+Install-Build-Required: false
+Version-Overrides:
+  '1.0.3':
+     Display-Name: Go 1.0.3
+     Provides:
+      - go-1.0
+      - "go"
+      - "go (version) = 1.0"
+      - "go (version) = 1"
+     Group-Overrides:
+       - components:
+         - go-1.0
+         - web_proxy
