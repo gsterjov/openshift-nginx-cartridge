@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Adapted from https://github.com/kr/heroku-buildpack-go
+#
+# usage: bin/compile <build-dir> <cache-dir>
+
+set -eo pipefail
+
+mkdir -p "$1" "$2"
+build=$(cd "$1/" && pwd)
+cache=$(cd "$2/" && pwd)
+buildpack=$(dirname $(dirname $0))
+
+pcre_ver=${PCREVERSION:-8.33}
+pcre_file=${PCREFILE:-pcre-$ver.tar.gz}
+pcre_url=${PCREURL:-ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$file}
+
+nginx_ver=${NGINXVERSION:-1.4.2}
+nginx_file=${GOFILE:-nginx-$ver.tar.gz}
+nginx_url=${NGINXURL:-http://nginx.org/download/$file}
+
+
+if test -e $build/bin && ! test -d $build/bin
+then
+    echo >&2 " !     File bin exists and is not a directory."
+    exit 1
+fi
+
+if test -d $cache/pcre-$ver/pcre
+then
+    echo "-----> Using PCRE $ver"
+else
+    #rm -rf $cache/* # be sure not to build up cruft
+    mkdir -p $cache/pcre-$ver
+    cd $cache/pcre-$ver
+    echo    "       First download, may take several minutes"
+    echo -n "-----> Installing PCRE $ver..."
+    curl -sO $url
+    tar zxf $file
+    rm -f $file
+    echo " done"
+fi
+
+if test -d $cache/nginx-$ver/nginx
+then
+    echo "-----> Using Nginx $ver"
+else
+    #rm -rf $cache/* # be sure not to build up cruft
+    mkdir -p $cache/nginx-$ver
+    cd $cache/nginx-$ver
+    echo    "       First download, may take several minutes"
+    echo -n "-----> Installing Nginx $ver..."
+    curl -sO $url
+    tar zxf $file
+    rm -f $file
+    echo " done"
+fi
+
+
+cd $cache/nginx-$ver/
+./configure --prefix=$build/nginx --with-pcre=$cache/pcre-$ver/ --with-http_ssl_module
+make
+make install
+make clean
