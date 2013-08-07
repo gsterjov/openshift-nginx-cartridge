@@ -12,12 +12,12 @@ cache=$(cd "$2/" && pwd)
 buildpack=$(dirname $(dirname $0))
 
 pcre_ver=${PCRE_VERSION:-8.33}
-pcre_file=${PCRE_FILE:-pcre-$ver.tar.gz}
-pcre_url=${PCRE_URL:-ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$file}
+pcre_file=${PCRE_FILE:-pcre-$pcre_ver.tar.gz}
+pcre_url=${PCRE_URL:-ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$pcre_file}
 
 nginx_ver=${NGINX_VERSION:-1.4.2}
-nginx_file=${NGINX_FILE:-nginx-$ver.tar.gz}
-nginx_url=${NGINX_URL:-http://nginx.org/download/$file}
+nginx_file=${NGINX_FILE:-nginx-$nginx_ver.tar.gz}
+nginx_url=${NGINX_URL:-http://nginx.org/download/$nginx_file}
 
 
 if test -e $build/bin && ! test -d $build/bin
@@ -26,39 +26,39 @@ then
     exit 1
 fi
 
-if test -d $cache/pcre-$ver/pcre
+if test -d $cache/pcre-$pcre_ver/pcre
 then
-    echo "-----> Using PCRE $ver"
+    echo "-----> Using PCRE $pcre_ver"
 else
     #rm -rf $cache/* # be sure not to build up cruft
-    mkdir -p $cache/pcre-$ver
-    cd $cache/pcre-$ver
+    mkdir -p $cache/pcre-$pcre_ver
+    cd $cache/pcre-$pcre_ver
     echo    "       First download, may take several minutes"
-    echo -n "-----> Installing PCRE $ver..."
-    curl -sO $url
-    tar zxf $file
-    rm -f $file
+    echo -n "-----> Installing PCRE $pcre_ver..."
+    curl -sO $pcre_url
+    tar zxf $pcre_file
+    rm -f $pcre_file
     echo " done"
 fi
 
-if test -d $cache/nginx-$ver/nginx
+if test -d $cache/nginx-$nginx_ver/nginx
 then
-    echo "-----> Using Nginx $ver"
+    echo "-----> Using Nginx $nginx_ver"
 else
     #rm -rf $cache/* # be sure not to build up cruft
-    mkdir -p $cache/nginx-$ver
-    cd $cache/nginx-$ver
+    mkdir -p $cache/nginx-$nginx_ver
+    cd $cache/nginx-$nginx_ver
     echo    "       First download, may take several minutes"
-    echo -n "-----> Installing Nginx $ver..."
-    curl -sO $url
-    tar zxf $file
-    rm -f $file
+    echo -n "-----> Installing Nginx $nginx_ver..."
+    curl -sO $nginx_url
+    tar zxf $nginx_file
+    rm -f $nginx_file
     echo " done"
 fi
 
 
-cd $cache/nginx-$ver/
-./configure --prefix=$build/nginx --with-pcre=$cache/pcre-$ver/ --with-http_ssl_module
+cd $cache/nginx-$nginx_ver/
+./configure --prefix=$build/nginx --with-pcre=$cache/pcre-$pcre_ver/ --with-http_ssl_module
 make
 make install
 make clean
