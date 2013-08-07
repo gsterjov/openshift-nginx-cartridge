@@ -3,7 +3,7 @@
 STOPTIMEOUT=10
 FMT="%a %b %d %Y %H:%M:%S GMT%z (%Z)"
 
-OPENSHIFT_NGINX_DIR=${OPENSHIFT_NGINX_DIR:-OPENSHIFT_REPO_DIR}
+OPENSHIFT_NGINX_DIR=${OPENSHIFT_NGINX_DIR:-$OPENSHIFT_REPO_DIR}
 
 function is_nginx_service_running() {
     if [ -f $OPENSHIFT_NGINX_DIR/pid/nginx.pid ]; then
