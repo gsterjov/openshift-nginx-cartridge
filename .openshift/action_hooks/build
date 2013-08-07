@@ -1,3 +1,4 @@
 #!/bin/bash
 
-${OPENSHIFT_REPO_DIR}/bin/control build
+OPENSHIFT_NGINX_DIR=${OPENSHIFT_NGINX_DIR:-OPENSHIFT_REPO_DIR}
+${OPENSHIFT_NGINX_DIR}/bin/control build
