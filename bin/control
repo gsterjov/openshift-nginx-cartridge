@@ -4,8 +4,8 @@ STOPTIMEOUT=10
 FMT="%a %b %d %Y %H:%M:%S GMT%z (%Z)"
 
 function is_nginx_service_running() {
-    if [ -f $OPENSHIFT_NGINX_DIR/pid/go.pid ]; then
-        go_pid=$( cat $OPENSHIFT_NGINX_DIR/pid/nginx.pid 2> /dev/null )
+    if [ -f $OPENSHIFT_NGINX_DIR/pid/nginx.pid ]; then
+        nginx_pid=$( cat $OPENSHIFT_NGINX_DIR/pid/nginx.pid 2> /dev/null )
         if `ps --pid $nginx_pid 2>&1`; then
             return 0
         fi
@@ -81,7 +81,7 @@ function restart() {
 }
 
 function build() {
-    ${OPENSHIFT_NGINX_DIR}/bin/compile ${OPENSHIFT_REPO_DIR} ${OPENSHIFT_NGINX_DIR}/cache
+    ${OPENSHIFT_NGINX_DIR}/bin/compile ${OPENSHIFT_REPO_DIR} ${OPENSHIFT_NGINX_DIR}/build_cache
 }
 
 function post-deploy() {
