@@ -11,13 +11,13 @@ build=$(cd "$1/" && pwd)
 cache=$(cd "$2/" && pwd)
 buildpack=$(dirname $(dirname $0))
 
-pcre_ver=${PCREVERSION:-8.33}
-pcre_file=${PCREFILE:-pcre-$ver.tar.gz}
-pcre_url=${PCREURL:-ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$file}
+pcre_ver=${PCRE_VERSION:-8.33}
+pcre_file=${PCRE_FILE:-pcre-$ver.tar.gz}
+pcre_url=${PCRE_URL:-ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$file}
 
-nginx_ver=${NGINXVERSION:-1.4.2}
-nginx_file=${GOFILE:-nginx-$ver.tar.gz}
-nginx_url=${NGINXURL:-http://nginx.org/download/$file}
+nginx_ver=${NGINX_VERSION:-1.4.2}
+nginx_file=${NGINX_FILE:-nginx-$ver.tar.gz}
+nginx_url=${NGINX_URL:-http://nginx.org/download/$file}
 
 
 if test -e $build/bin && ! test -d $build/bin
