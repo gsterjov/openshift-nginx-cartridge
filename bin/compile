@@ -26,13 +26,13 @@ then
     exit 1
 fi
 
-if test -d $cache/pcre-$pcre_ver/pcre
+if test -d $cache/pcre-$pcre_ver
 then
     echo "-----> Using PCRE $pcre_ver"
 else
     #rm -rf $cache/* # be sure not to build up cruft
     mkdir -p $cache/pcre-$pcre_ver
-    cd $cache/pcre-$pcre_ver
+    cd $cache
     echo    "       First download, may take several minutes"
     echo -n "-----> Installing PCRE $pcre_ver..."
     curl -sO $pcre_url
@@ -41,13 +41,13 @@ else
     echo " done"
 fi
 
-if test -d $cache/nginx-$nginx_ver/nginx
+if test -d $cache/nginx-$nginx_ver
 then
     echo "-----> Using Nginx $nginx_ver"
 else
     #rm -rf $cache/* # be sure not to build up cruft
     mkdir -p $cache/nginx-$nginx_ver
-    cd $cache/nginx-$nginx_ver
+    cd $cache
     echo    "       First download, may take several minutes"
     echo -n "-----> Installing Nginx $nginx_ver..."
     curl -sO $nginx_url
