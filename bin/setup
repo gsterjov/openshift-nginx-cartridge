@@ -12,7 +12,7 @@ parse_args $@
 # Don't set -u until after the above arg parsing is complete
 set -u
 
-echo "$version" > $OPENSHIFT_NGINX_DIR/env/NGINXVERSION
+echo "$version" > $OPENSHIFT_NGINX_DIR/env/NGINX_VERSION
 
 ###
 pushd $OPENSHIFT_NGINX_DIR > /dev/null

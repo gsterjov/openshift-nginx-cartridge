@@ -3,10 +3,10 @@
 STOPTIMEOUT=10
 FMT="%a %b %d %Y %H:%M:%S GMT%z (%Z)"
 
-function is_go_service_running() {
-    if [ -f $OPENSHIFT_GO_DIR/pid/go.pid ]; then
-        go_pid=$( cat $OPENSHIFT_GO_DIR/pid/go.pid 2> /dev/null )
-        if `ps --pid $go_pid 2>&1`; then
+function is_nginx_service_running() {
+    if [ -f $OPENSHIFT_NGINX_DIR/pid/go.pid ]; then
+        go_pid=$( cat $OPENSHIFT_NGINX_DIR/pid/nginx.pid 2> /dev/null )
+        if `ps --pid $nginx_pid 2>&1`; then
             return 0
         fi
     fi
@@ -15,7 +15,7 @@ function is_go_service_running() {
 }
 
 function status() {
-    if [ is_go_service_running ]; then
+    if [ is_nginx_service_running ]; then
         client_result "Application is running"
     else
         client_result "Application is not running"
@@ -24,11 +24,11 @@ function status() {
 
 
 function start() {
-    logf="$OPENSHIFT_GO_DIR/logs/go.log"
+    logf="$OPENSHIFT_NGINX_DIR/logs/nginx.log"
     pushd "$OPENSHIFT_REPO_DIR" > /dev/null
     {
-        godir=$(cat .godir)
-        package=$(basename $godir)
+        nginx_dir=$(cat .nginx_dir)
+        package=$(basename $nginx_dir)
 
         if [ -f "bin/$package" ]; then
             echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from bin/$package..."
@@ -38,7 +38,7 @@ function start() {
             ret=$?
             npid=$!
             if [ $ret -eq 0 ]; then
-                echo "$npid" > "$OPENSHIFT_GO_DIR/pid/go.pid"
+                echo "$npid" > "$OPENSHIFT_NGINX_DIR/pid/nginx.pid"
             else
                 echo "Application '$OPENSHIFT_APP_NAME' failed to start - $ret" 1>&2
                 exit $ret
@@ -50,26 +50,26 @@ function start() {
 }
 
 function stop() {
-    if [ -f $OPENSHIFT_GO_DIR/pid/go.pid ]; then
-        go_pid=$( cat $OPENSHIFT_GO_DIR/pid/go.pid 2> /dev/null )
+    if [ -f $OPENSHIFT_NGINX_DIR/pid/nginx.pid ]; then
+        nginx_pid=$( cat $OPENSHIFT_NGINX_DIR/pid/nginx.pid 2> /dev/null )
     fi
 
-    if [ -n "$go_pid" ]; then
-        logf="$OPENSHIFT_GO_DIR/logs/go.log"
+    if [ -n "$nginx_pid" ]; then
+        logf="$OPENSHIFT_NGINX_DIR/logs/nginx.log"
         echo "`date +"$FMT"`: Stopping application '$OPENSHIFT_APP_NAME' ..." >> $logf
-        /bin/kill $go_pid
+        /bin/kill $nginx_pid
         ret=$?
         if [ $ret -eq 0 ]; then
             TIMEOUT="$STOPTIMEOUT"
-            while [ $TIMEOUT -gt 0 ] && is_go_service_running ; do
-                /bin/kill -0 "$go_pid" >/dev/null 2>&1 || break
+            while [ $TIMEOUT -gt 0 ] && is_nginx_service_running ; do
+                /bin/kill -0 "$nginx_pid" >/dev/null 2>&1 || break
                 sleep 1
                 let TIMEOUT=${TIMEOUT}-1
             done
         fi
 
-        echo "`date +"$FMT"`: Stopped Go application '$OPENSHIFT_APP_NAME'" >> $logf
-        rm -f $OPENSHIFT_GO_DIR/pid/go.pid
+        echo "`date +"$FMT"`: Stopped Nginx application '$OPENSHIFT_APP_NAME'" >> $logf
+        rm -f $OPENSHIFT_NGINX_DIR/pid/nginx.pid
     else
         echo "Warning: Application '$OPENSHIFT_APP_NAME' server exists without a pid file.  Use force-stop to kill." 1>&2
     fi
@@ -93,10 +93,10 @@ function pre-build() {
 }
 
 function tidy() {
-  client_message "Emptying log dir: $OPENSHIFT_GO_DIR/logs"
+  client_message "Emptying log dir: $OPENSHIFT_NGINX_DIR/logs"
   shopt -s dotglob
-  rm -rf $OPENSHIFT_GO_DIR/logs/*
-  rm -rf $OPENSHIFT_GO_DIR/tmp/*
+  rm -rf $OPENSHIFT_NGINX_DIR/logs/*
+  rm -rf $OPENSHIFT_NGINX_DIR/tmp/*
 }
 
 #
