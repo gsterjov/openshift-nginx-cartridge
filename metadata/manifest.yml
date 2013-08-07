@@ -1,20 +1,19 @@
-Name: go
-Cartridge-Short-Name: GO
-Display-Name: Go 1.1
-Version: "1.1"
-Versions: ["1.1", "1.0.3"]
-Website: https://github.com/smarterclayton/openshift-go-cart
+Name: nginx
+Cartridge-Short-Name: NGINX
+Display-Name: Nginx
+Version: "1.4.2"
+Versions: ["1.4.2"]
+Website: https://github.com/gsterjov/openshift-nginx-cart
 Cartridge-Version: 0.0.1
-Cartridge-Vendor: smarterclayton
+Cartridge-Vendor: gsterjov
 Categories:
   - service
-  - golang
   - web_framework
 Provides:
-  - go-1.1
-  - "go"
-  - "go (version) = 1.1"
-  - "go (version) = 1"
+  - nginx-1.4.2
+  - "nginx"
+  - "nginx (version) = 1.4.2"
+  - "nginx (version) = 1"
 Scaling:
   Min: 1
   Max: -1
@@ -29,18 +28,9 @@ Subscribes:
   set-db-connection-info:
     Type: "ENV:NET_TCP:db:connection-info"
     Required: false
-  set-mysql-connection-info:
-    Type: "NET_TCP:db:mysql"
-    Required : false
-  set-postgres-connection-info:
-    Type: "NET_TCP:db:postgres"
-    Required : false
-  set-nosql-db-connection-info:
-    Type: "ENV:NET_TCP:nosqldb:connection-info"
-    Required : false
 Group-Overrides:
   - components:
-    - go-1.1
+    - nginx-1.4.2
     - web_proxy
 Endpoints:
   - Private-IP-Name:   IP
@@ -55,15 +45,3 @@ Endpoints:
         Backend:       ""
         Options:       { health: true }
 Install-Build-Required: false
-Version-Overrides:
-  '1.0.3':
-     Display-Name: Go 1.0.3
-     Provides:
-      - go-1.0
-      - "go"
-      - "go (version) = 1.0"
-      - "go (version) = 1"
-     Group-Overrides:
-       - components:
-         - go-1.0
-         - web_proxy
