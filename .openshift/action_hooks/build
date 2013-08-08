@@ -1,4 +1,11 @@
 #!/bin/bash
 
-OPENSHIFT_NGINX_DIR=${OPENSHIFT_NGINX_DIR:-$OPENSHIFT_REPO_DIR}
-${OPENSHIFT_NGINX_DIR}/bin/control build
+version=${NGINX_VERSION:-1.4.2}
+binaries=${OPENSHIFT_REPO_DIR}/versions/$version
+
+${OPENSHIFT_REPO_DIR}/bin/compile ${OPENSHIFT_REPO_DIR}/build_output ${OPENSHIFT_REPO_DIR}/build_cache
+
+cp -r ${OPENSHIFT_REPO_DIR}/build_output/nginx $binaries
+
+rm -rf ${OPENSHIFT_REPO_DIR}/build_cache
+rm -rf ${OPENSHIFT_REPO_DIR}/build_output

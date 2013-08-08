@@ -3,8 +3,6 @@
 STOPTIMEOUT=10
 FMT="%a %b %d %Y %H:%M:%S GMT%z (%Z)"
 
-OPENSHIFT_NGINX_DIR=${OPENSHIFT_NGINX_DIR:-$OPENSHIFT_REPO_DIR}
-
 function is_nginx_service_running() {
     if [ -f $OPENSHIFT_NGINX_DIR/pid/nginx.pid ]; then
         nginx_pid=$( cat $OPENSHIFT_NGINX_DIR/pid/nginx.pid 2> /dev/null )
@@ -27,7 +25,7 @@ function status() {
 
 function start() {
     logf="$OPENSHIFT_NGINX_DIR/logs/nginx.log"
-    pushd "$OPENSHIFT_REPO_DIR" > /dev/null
+    pushd "$OPENSHIFT_NGINX_DIR" > /dev/null
     {
         nginx_dir=$(cat .nginx_dir)
         package=$(basename $nginx_dir)
@@ -83,7 +81,6 @@ function restart() {
 }
 
 function build() {
-    ${OPENSHIFT_NGINX_DIR}/bin/compile ${OPENSHIFT_NGINX_DIR} ${OPENSHIFT_NGINX_DIR}/build_cache
 }
 
 function post-deploy() {
