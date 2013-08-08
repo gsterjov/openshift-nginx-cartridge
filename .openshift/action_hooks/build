@@ -3,9 +3,12 @@
 version=${NGINX_VERSION:-1.4.2}
 binaries=${OPENSHIFT_REPO_DIR}/versions/$version
 
-${OPENSHIFT_REPO_DIR}/bin/compile ${OPENSHIFT_REPO_DIR}/build_output ${OPENSHIFT_REPO_DIR}/build_cache
+pushd tmp
 
-cp -r ${OPENSHIFT_REPO_DIR}/build_output/nginx $binaries
+${OPENSHIFT_REPO_DIR}/bin/compile ${OPENSHIFT_REPO_DIR}/tmp
 
-rm -rf ${OPENSHIFT_REPO_DIR}/build_cache
-rm -rf ${OPENSHIFT_REPO_DIR}/build_output
+cp -f build/sbin/nginx $binaries/bin/nginx
+cp -r build/conf $binaries/conf
+
+popd
+rm -rf ${OPENSHIFT_REPO_DIR}/tmp

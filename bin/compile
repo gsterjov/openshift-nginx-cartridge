@@ -1,53 +1,43 @@
 #!/bin/bash
 #
-# Adapted from https://github.com/kr/heroku-buildpack-go
-#
-# usage: bin/compile <build-dir> <cache-dir>
+# usage: bin/compile <build-dir>
 
 set -eo pipefail
 
-mkdir -p "$1" "$2"
-build=$(cd "$1/" && pwd)
-cache=$(cd "$2/" && pwd)
+mkdir -p "$1/build" "$1/src"
+bin_dir=$(cd "$1/build" && pwd)
+src_dir=$(cd "$1/src" && pwd)
 buildpack=$(dirname $(dirname $0))
 
 pcre_ver=${PCRE_VERSION:-8.33}
 pcre_file=${PCRE_FILE:-pcre-$pcre_ver.tar.gz}
-pcre_url=${PCRE_URL:-ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/$pcre_file}
+pcre_url=${PCRE_URL:-http://sourceforge.net/projects/pcre/files/pcre/$pcre_ver/$pcre_file}
 
 nginx_ver=${NGINX_VERSION:-1.4.2}
 nginx_file=${NGINX_FILE:-nginx-$nginx_ver.tar.gz}
 nginx_url=${NGINX_URL:-http://nginx.org/download/$nginx_file}
 
 
-if test -e $build/bin && ! test -d $build/bin
-then
-    echo >&2 " !     File bin exists and is not a directory."
-    exit 1
-fi
-
-if test -d $cache/pcre-$pcre_ver
+if test -d $src_dir/pcre-$pcre_ver
 then
     echo "-----> Using PCRE $pcre_ver"
 else
-    #rm -rf $cache/* # be sure not to build up cruft
-    mkdir -p $cache/pcre-$pcre_ver
-    cd $cache
+    mkdir -p $src_dir/pcre-$pcre_ver
+    cd $src_dir
     echo    "       First download, may take several minutes"
     echo -n "-----> Installing PCRE $pcre_ver..."
-    curl -sO $pcre_url
+    curl -sOL $pcre_url
     tar zxf $pcre_file
     rm -f $pcre_file
     echo " done"
 fi
 
-if test -d $cache/nginx-$nginx_ver
+if test -d $src_dir/nginx-$nginx_ver
 then
     echo "-----> Using Nginx $nginx_ver"
 else
-    #rm -rf $cache/* # be sure not to build up cruft
-    mkdir -p $cache/nginx-$nginx_ver
-    cd $cache
+    mkdir -p $src_dir/nginx-$nginx_ver
+    cd $src_dir
     echo    "       First download, may take several minutes"
     echo -n "-----> Installing Nginx $nginx_ver..."
     curl -sO $nginx_url
@@ -57,8 +47,8 @@ else
 fi
 
 
-cd $cache/nginx-$nginx_ver/
-./configure --prefix=$build/nginx --with-pcre=$cache/pcre-$pcre_ver/ --with-http_ssl_module
+cd $src_dir/nginx-$nginx_ver/
+./configure --prefix=$bin_dir --with-pcre=$src_dir/pcre-$pcre_ver/ --with-http_ssl_module
 make
 make install
 make clean
