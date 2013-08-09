@@ -30,10 +30,10 @@ function start() {
         nginx_dir=$(cat .nginx_dir)
         package=$(basename $nginx_dir)
 
-        if [ -f "bin/$package" ]; then
-            echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from bin/$package..."
+        if [ -f "versions/$NGINX_VERSION/bin/$package" ]; then
+            echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from versions/$NGINX_VERSION/bin/$package..."
 
-            nohup "bin/$package" >> $logf 2>&1 &
+            nohup "versions/$NGINX_VERSION/bin/$package -c versions/$NGINX_VERSION/conf/nginx.conf" >> $logf 2>&1 &
 
             ret=$?
             npid=$!
@@ -44,7 +44,7 @@ function start() {
                 exit $ret
             fi
         else
-            echo "WARN: Could not find the compiled application bin/$package, will not start"
+            echo "WARN: Could not find the compiled application versions/$NGINX_VERSION/bin/$package, will not start"
         fi
     } >> $logf
 }
