@@ -24,16 +24,13 @@ function status() {
 
 
 function start() {
-    logf="$OPENSHIFT_NGINX_DIR/logs/nginx.log"
+    logf="$OPENSHIFT_NGINX_LOG_DIR/nginx.log"
     pushd "$OPENSHIFT_NGINX_DIR" > /dev/null
     {
-        nginx_dir=$(cat .nginx_dir)
-        package=$(basename $nginx_dir)
+        if [ -f "versions/$NGINX_VERSION/bin/nginx" ]; then
+            echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from versions/$NGINX_VERSION/bin/nginx..."
 
-        if [ -f "versions/$NGINX_VERSION/bin/$package" ]; then
-            echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from versions/$NGINX_VERSION/bin/$package..."
-
-            nohup "versions/$NGINX_VERSION/bin/$package -c versions/$NGINX_VERSION/conf/nginx.conf" >> $logf 2>&1 &
+            nohup "versions/$NGINX_VERSION/bin/nginx -c $OPENSHIFT_NGINX_DIR/conf/nginx.conf" >> $logf 2>&1 &
 
             ret=$?
             npid=$!
@@ -44,7 +41,7 @@ function start() {
                 exit $ret
             fi
         else
-            echo "WARN: Could not find the compiled application versions/$NGINX_VERSION/bin/$package, will not start"
+            echo "WARN: Could not find the compiled application versions/$NGINX_VERSION/bin/nginx, will not start"
         fi
     } >> $logf
 }
@@ -55,7 +52,7 @@ function stop() {
     fi
 
     if [ -n "$nginx_pid" ]; then
-        logf="$OPENSHIFT_NGINX_DIR/logs/nginx.log"
+        logf="$OPENSHIFT_NGINX_LOG_DIR/nginx.log"
         echo "`date +"$FMT"`: Stopping application '$OPENSHIFT_APP_NAME' ..." >> $logf
         /bin/kill $nginx_pid
         ret=$?
@@ -81,6 +78,7 @@ function restart() {
 }
 
 function build() {
+    echo
 }
 
 function post-deploy() {
@@ -92,7 +90,7 @@ function pre-build() {
 }
 
 function tidy() {
-  client_message "Emptying log dir: $OPENSHIFT_NGINX_DIR/logs"
+  client_message "Emptying log dir: $OPENSHIFT_NGINX_LOG_DIR"
   shopt -s dotglob
   rm -rf $OPENSHIFT_NGINX_DIR/logs/*
   rm -rf $OPENSHIFT_NGINX_DIR/tmp/*

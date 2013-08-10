@@ -9,10 +9,8 @@ pushd ${OPENSHIFT_REPO_DIR}/tmp
 ${OPENSHIFT_REPO_DIR}/bin/compile ${OPENSHIFT_REPO_DIR}/tmp
 
 mkdir -p $binaries/bin
-mkdir -p $binaries
 
-cp -f build/sbin/nginx $binaries/bin
-cp -r build/conf $binaries
+cp -f build/nginx $binaries/bin
 
 popd
 rm -rf ${OPENSHIFT_REPO_DIR}/tmp
