@@ -15,7 +15,7 @@ function is_nginx_service_running() {
 }
 
 function status() {
-    if [ is_nginx_service_running ]; then
+    if is_nginx_service_running; then
         client_result "Application is running"
     else
         client_result "Application is not running"

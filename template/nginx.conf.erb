@@ -1,9 +1,8 @@
 server {
-    listen       <%= ENV['OPENSHIFT_NGINX_IP'] %>:<%= ENV['OPENSHIFT_NGINX_PORT'] %>;
-    server_name  localhost;
+    listen  <%= ENV['OPENSHIFT_NGINX_IP'] %>:<%= ENV['OPENSHIFT_NGINX_PORT'] %>;
+    root    <%= ENV['OPENSHIFT_REPO_DIR'] %>public;
 
-    location /public {
-        root   html;
+    location / {
         index  index.html index.htm;
     }
 }
