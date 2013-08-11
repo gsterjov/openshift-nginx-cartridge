@@ -1,7 +1,7 @@
 worker_processes  1;
 
-error_log  <%= ENV['OPENSHIFT_NGINX_LOG_DIR'] %>/error.log;
-pid        <%= ENV['OPENSHIFT_NGINX_DIR'] %>/pid/nginx.pid;
+error_log  <%= ENV['OPENSHIFT_NGINX_LOG_DIR'] %>error.log;
+pid        <%= ENV['OPENSHIFT_NGINX_DIR'] %>pid/nginx.pid;
 
 events {
     worker_connections  1024;
@@ -12,13 +12,17 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    root        <%= ENV['OPENSHIFT_REPO_DIR'] %>
-    access_log  <%= ENV['OPENSHIFT_NGINX_LOG_DIR'] %>/access.log  main;
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    root        <%= ENV['OPENSHIFT_REPO_DIR'] %>;
+    access_log  <%= ENV['OPENSHIFT_NGINX_LOG_DIR'] %>access.log  main;
 
     sendfile  on;
     gzip      on;
 
     keepalive_timeout  65;
 
-    include  <%= ENV['OPENSHIFT_REPO_DIR'] %>/nginx.conf
+    include  <%= ENV['OPENSHIFT_REPO_DIR'] %>nginx.conf;
 }

@@ -30,7 +30,7 @@ function start() {
         if [ -f "versions/$NGINX_VERSION/bin/nginx" ]; then
             echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from versions/$NGINX_VERSION/bin/nginx..."
 
-            nohup "versions/$NGINX_VERSION/bin/nginx -c $OPENSHIFT_NGINX_DIR/conf/nginx.conf" >> $logf 2>&1 &
+            nohup "versions/$NGINX_VERSION/bin/nginx" -c "$OPENSHIFT_NGINX_DIR/conf/nginx.conf" >> $logf 2>&1 &
 
             ret=$?
             npid=$!
