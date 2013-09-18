@@ -1,16 +1,19 @@
 #!/bin/bash
 
+set +e
+mkdir -p tmp
+set -e
+
 version=${NGINX_VERSION:-1.4.2}
-binaries=${OPENSHIFT_REPO_DIR}/versions/$version
+binaries="versions/$version"
 
-mkdir ${OPENSHIFT_REPO_DIR}/tmp
-pushd ${OPENSHIFT_REPO_DIR}/tmp
 
-${OPENSHIFT_REPO_DIR}/bin/compile ${OPENSHIFT_REPO_DIR}/tmp
+pushd tmp
+
+bin/compile ./tmp
 
 mkdir -p $binaries/bin
-
 cp -f build/nginx $binaries/bin
 
 popd
-rm -rf ${OPENSHIFT_REPO_DIR}/tmp
+rm -rf tmp/build

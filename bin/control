@@ -74,6 +74,11 @@ function stop() {
     fi
 }
 
+function update() {
+    stop
+    ./.openshift/action_hooks/build
+}
+
 function restart() {
     stop
     start
@@ -121,6 +126,7 @@ case "$1" in
     pre-build)           pre-build   ;;
     post-deploy)         post-deploy ;;
     tidy)                tidy        ;;
+    update)              update      ;;
     *) exit 0;
 esac
 

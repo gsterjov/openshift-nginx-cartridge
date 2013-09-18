@@ -1,6 +1,2 @@
-locked_files:
-- env/
-- env/*
-- versions/
 processed_templates:
 - 'conf/*.erb'
