@@ -3,4 +3,4 @@ locked_files:
 - env/*
 - versions/
 processed_templates:
-- '**/*.erb'
+- 'conf/*.erb'

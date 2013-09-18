@@ -29,6 +29,7 @@ function start() {
         if [ -f "versions/$NGINX_VERSION/bin/nginx" ]; then
             echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from versions/$NGINX_VERSION/bin/nginx..."
 
+            erb "$OPENSHIFT_REPO_DIR/nginx.conf.erb" > "$OPENSHIFT_REPO_DIR/nginx.conf"
             nohup "versions/$NGINX_VERSION/bin/nginx" -c "conf/nginx.conf" >> $logf 2>&1 &
 
             ret=$?
