@@ -6,18 +6,15 @@ case "$1" in
 esac
 
 # Parse arguments
-source "${OPENSHIFT_NGINX_DIR}/lib/util"
+source "lib/util"
 parse_args $@
 
 # Don't set -u until after the above arg parsing is complete
 set -u
 
-echo "$version" > $OPENSHIFT_NGINX_DIR/env/NGINX_VERSION
+echo "$version" > env/NGINX_VERSION
 
-###
-pushd $OPENSHIFT_NGINX_DIR > /dev/null
+
 for dir in logs tmp pid; do
 	mkdir -p $dir
 done
-popd > /dev/null
-
