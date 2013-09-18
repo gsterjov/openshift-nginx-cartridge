@@ -4,8 +4,8 @@
 
 set -eo pipefail
 
-mkdir -p "$1/build" "$1/src"
-bin_dir=$(cd "$1/build" && pwd)
+mkdir -p "$1/out" "$1/src"
+bin_dir=$(cd "$1/out" && pwd)
 src_dir=$(cd "$1/src" && pwd)
 buildpack=$(dirname $(dirname $0))
 

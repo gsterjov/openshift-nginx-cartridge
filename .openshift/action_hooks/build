@@ -1,19 +1,16 @@
 #!/bin/bash
 
 set +e
-mkdir -p tmp
+mkdir -p tmp/build
 set -e
 
 version=${NGINX_VERSION:-1.4.2}
 binaries="versions/$version"
 
 
-pushd tmp
-
-bin/compile ./tmp
+bin/compile ./tmp/build
 
 mkdir -p $binaries/bin
-cp -f build/nginx $binaries/bin
+cp -f tmp/build/out/nginx $binaries/bin
 
-popd
 rm -rf tmp/build
