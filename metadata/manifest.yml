@@ -3,6 +3,7 @@ Cartridge-Short-Name: NGINX
 Display-Name: Nginx
 Version: "1.4.2"
 Versions: ["1.4.2"]
+Source-Url: https://github.com/gsterjov/openshift-nginx-cart.git
 Website: https://github.com/gsterjov/openshift-nginx-cart
 Cartridge-Version: 0.0.1
 Cartridge-Vendor: gsterjov
