@@ -1,7 +1,7 @@
-error_log  <%= ENV['OPENSHIFT_NGINX_LOG_DIR'] %>error.log;
-pid        <%= ENV['OPENSHIFT_NGINX_DIR'] %>pid/nginx.pid;
+error_log  <%= ENV['OPENSHIFT_NGINX_DIR'] %>logs/error.log;
+pid        <%= ENV['OPENSHIFT_NGINX_DIR'] %>run/nginx.pid;
 
-worker_processes  1;
+worker_processes  2;
 
 events {
     worker_connections  1024;
@@ -12,17 +12,17 @@ http {
     include       mime.types;
     default_type  application/octet-stream;
 
-    client_body_temp_path  <%= ENV['OPENSHIFT_NGINX_DIR'] %>tmp/client_temp;
-    proxy_temp_path        <%= ENV['OPENSHIFT_NGINX_DIR'] %>tmp/proxy_temp;
-    fastcgi_temp_path      <%= ENV['OPENSHIFT_NGINX_DIR'] %>tmp/fastcgi_temp;
-    uwsgi_temp_path        <%= ENV['OPENSHIFT_NGINX_DIR'] %>tmp/uwsgi_temp;
-    scgi_temp_path         <%= ENV['OPENSHIFT_NGINX_DIR'] %>tmp/scgi_temp;
+    client_body_temp_path  <%= ENV['OPENSHIFT_TMP_DIR'] %>client_temp;
+    proxy_temp_path        <%= ENV['OPENSHIFT_TMP_DIR'] %>proxy_temp;
+    fastcgi_temp_path      <%= ENV['OPENSHIFT_TMP_DIR'] %>fastcgi_temp;
+    uwsgi_temp_path        <%= ENV['OPENSHIFT_TMP_DIR'] %>uwsgi_temp;
+    scgi_temp_path         <%= ENV['OPENSHIFT_TMP_DIR'] %>scgi_temp;
 
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
 
-    access_log  <%= ENV['OPENSHIFT_NGINX_LOG_DIR'] %>access.log  main;
+    access_log  <%= ENV['OPENSHIFT_NGINX_DIR'] %>logs/access.log  main;
 
     sendfile  on;
     gzip      on;

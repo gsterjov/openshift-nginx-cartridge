@@ -1,132 +1,109 @@
 #!/bin/bash
 
-STOPTIMEOUT=10
-FMT="%a %b %d %Y %H:%M:%S GMT%z (%Z)"
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
 
-function is_nginx_service_running() {
-    if [ -f pid/nginx.pid ]; then
-        nginx_pid=$( cat pid/nginx.pid 2> /dev/null )
-        if `ps --pid $nginx_pid 2>&1`; then
-            return 0
-        fi
-    fi
 
-    return 1
-}
-
-function status() {
-    if is_nginx_service_running; then
-        client_result "Application is running"
-    else
-        client_result "Application is not running"
-    fi
-}
+NGINX_EXEC=$OPENSHIFT_NGINX_DIR/usr/versions/$NGINX_VERSION/bin/nginx
+NGINX_CONFIG_FILE=$OPENSHIFT_NGINX_DIR/conf/nginx.conf
+NGINX_PID_FILE=$OPENSHIFT_NGINX_DIR/run/nginx.pid
 
 
 function start() {
-    logf="logs/nginx.log"
-    {
-        if [ -f "versions/$NGINX_VERSION/bin/nginx" ]; then
-            echo "`date +"$FMT"`: Starting application '$OPENSHIFT_APP_NAME' from versions/$NGINX_VERSION/bin/nginx..."
+    echo "Starting Nginx"
 
-            erb "$OPENSHIFT_REPO_DIR/nginx.conf.erb" > "$OPENSHIFT_REPO_DIR/nginx.conf"
+    if [ -f "$NGINX_EXEC" ]; then
 
-            # nginx will always use the prefix defined at compile time unless an absolute path to the conf file is given
-            nohup "versions/$NGINX_VERSION/bin/nginx" -c "$OPENSHIFT_NGINX_DIR/conf/nginx.conf" >> $logf 2>&1 &
-
-            ret=$?
-            npid=$!
-            if [ $ret -eq 0 ]; then
-                echo "$npid" > "pid/nginx.pid"
-            else
-                echo "Application '$OPENSHIFT_APP_NAME' failed to start - $ret" 1>&2
-                exit $ret
-            fi
-        else
-            echo "WARN: Could not find the compiled application versions/$NGINX_VERSION/bin/nginx, will not start"
+        if [ -f "$OPENSHIFT_REPO_DIR/nginx.conf.erb" ]; then
+            oo-erb $OPENSHIFT_REPO_DIR/nginx.conf.erb > $OPENSHIFT_REPO_DIR/nginx.conf
         fi
-    } >> $logf
+
+        # nginx will always use the prefix defined at compile time unless an absolute path to the conf file is given
+        nohup "$NGINX_EXEC" -c "$NGINX_CONFIG_FILE" 2>&1
+        [ "$?" == "0" ] && wait_for_pid_file $NGINX_PID_FILE
+
+    else
+        echo "WARN: Could not find the compiled application versions/$NGINX_VERSION/bin/nginx, will not start"
+    fi
 }
+
 
 function stop() {
-    if [ -f pid/nginx.pid ]; then
-        nginx_pid=$( cat pid/nginx.pid 2> /dev/null )
-    fi
+    echo "Starting Nginx"
 
-    if [ -n "$nginx_pid" ]; then
-        logf="logs/nginx.log"
-        echo "`date +"$FMT"`: Stopping application '$OPENSHIFT_APP_NAME' ..." >> $logf
-        /bin/kill $nginx_pid
-        ret=$?
-        if [ $ret -eq 0 ]; then
-            TIMEOUT="$STOPTIMEOUT"
-            while [ $TIMEOUT -gt 0 ] && is_nginx_service_running ; do
-                /bin/kill -0 "$nginx_pid" >/dev/null 2>&1 || break
-                sleep 1
-                let TIMEOUT=${TIMEOUT}-1
-            done
-        fi
-
-        echo "`date +"$FMT"`: Stopped Nginx application '$OPENSHIFT_APP_NAME'" >> $logf
-        rm -f pid/nginx.pid
-    else
-        echo "Warning: Application '$OPENSHIFT_APP_NAME' server exists without a pid file.  Use force-stop to kill." 1>&2
+    if [ -f "$NGINX_PID_FILE" ]; then
+        pid=`cat "$NGINX_PID_FILE" 2> /dev/null`
+        eval "'$NGINX_EXEC' -c '$NGINX_CONFIG_FILE' -s stop"
+        wait_for_stop $pid
     fi
 }
 
-function update() {
-    stop
-    ./.openshift/action_hooks/build
-}
 
 function restart() {
+    echo "Restarting Nginx"
     stop
     start
 }
 
-function build() {
-    echo
+
+function status() {
+    res=0
+    output=$(curl -s -m 30 http://$OPENSHIFT_NGINX_IP:$OPENSHIFT_NGINX_PORT/ &> /dev/null) || res=1
+
+    if [ $res -eq 0 ]
+    then
+        client_result "Nginx is running"
+        client_result "$output"
+    else
+        client_result "Nginx is either stopped or inaccessible"
+    fi
 }
 
-function post-deploy() {
-    echo
+
+function reload() {
+    echo "Reloading Nginx"
+
+    if [ -f "$NGINX_PID_FILE" ]
+    then
+        pid=`cat "$NGINX_PID_FILE" 2> /dev/null`
+        output=$("$NGINX_EXEC" -c "$NGINX_CONFIG_FILE" -s reload)
+        client_result "$output"
+    else
+        client_result "Cannot reload Nginx as it is not running"
+    fi
 }
 
-function pre-build() {
-    echo
-}
 
 function tidy() {
-  client_message "Emptying log dir: $OPENSHIFT_NGINX_LOG_DIR"
-  shopt -s dotglob
-  rm -rf logs/*
-  rm -rf tmp/*
+    client_message "Emptying log dir: $OPENSHIFT_NGINX_DIR/logs"
+    shopt -s dotglob
+    rm -rf logs/*
 }
 
-#
-#  main():
-#
 
-# Ensure arguments.
-if ! [ $# -eq 1 ]; then
-    echo "Usage: $0 [start|restart|graceful|graceful-stop|stop|status]"
-    exit 1
-fi
+function update() {
+    version=${NGINX_VERSION:-1.4.4}
 
-# Source utility functions.
-source $OPENSHIFT_CARTRIDGE_SDK_BASH
+    echo "Rebuilding Nginx v$version"
+    stop
 
-# Handle commands.
+    mkdir -p tmp/build
+    bin/compile tmp/build
+
+    bin_dir="usr/versions/$version/bin"
+    mkdir -p $bin_dir
+    cp -f tmp/build/out/nginx $bin_dir
+    
+    rm -rf tmp/build
+}
+
+
 case "$1" in
-    start)               start       ;;
-    restart|graceful)    restart     ;;
-    graceful-stop|stop)  stop        ;;
-    status)              status      ;;
-    build)               build       ;;
-    pre-build)           pre-build   ;;
-    post-deploy)         post-deploy ;;
-    tidy)                tidy        ;;
-    update)              update      ;;
-    *) exit 0;
+  start)     start ;;
+  stop)      stop ;;
+  restart)   restart ;;
+  status)    status ;;
+  reload)    reload ;;
+  tidy)      tidy ;;
+  update)    update ;;
+  *)         exit 0
 esac
-

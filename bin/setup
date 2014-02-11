@@ -15,6 +15,6 @@ set -u
 echo "$version" > env/NGINX_VERSION
 
 
-for dir in logs tmp pid; do
+for dir in logs run; do
 	mkdir -p $dir
 done
