@@ -11,9 +11,9 @@ Categories:
   - nginx
   - web_framework
 Provides:
-  - nginx-1.4
+  - nginx-1.7
   - nginx
-  - nginx(version) = 1.4.4
+  - nginx(version) = 1.7.0
 Scaling:
   Min: 1
   Max: -1
@@ -37,7 +37,7 @@ Subscribes:
     Required: false
 Group-Overrides:
   - components:
-    - nginx-1.4
+    - nginx-1.7
     - web_proxy
 Endpoints:
   - Private-IP-Name:   IP
