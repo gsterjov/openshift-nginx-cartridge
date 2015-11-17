@@ -28,7 +28,7 @@ function start() {
 
 
 function stop() {
-    echo "Starting Nginx"
+    echo "Stopping Nginx"
 
     if [ -f "$NGINX_PID_FILE" ]; then
         pid=`cat "$NGINX_PID_FILE" 2> /dev/null`
